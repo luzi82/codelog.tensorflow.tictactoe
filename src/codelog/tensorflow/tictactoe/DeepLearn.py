@@ -9,8 +9,10 @@ def new_var_dict():
     ret = {}
     ret['w0']=tf.Variable(tf.zeros([9,50],dtype=tf.float32))
     ret['b1']=tf.Variable(tf.zeros([50],dtype=tf.float32))
-    ret['w2']=tf.Variable(tf.zeros([50,9],dtype=tf.float32))
-    ret['b3']=tf.Variable(tf.zeros([9],dtype=tf.float32))
+    ret['w2']=tf.Variable(tf.zeros([50,50],dtype=tf.float32))
+    ret['b3']=tf.Variable(tf.zeros([50],dtype=tf.float32))
+    ret['w4']=tf.Variable(tf.zeros([50,9],dtype=tf.float32))
+    ret['b5']=tf.Variable(tf.zeros([9],dtype=tf.float32))
     return ret
 
 def new_train_ph_dict():
@@ -30,6 +32,9 @@ def get_q(state_ph,var_dict):
     mid = tf.nn.relu(mid)
     mid = tf.matmul(mid,var_dict['w2'])
     mid = mid + var_dict['b3']
+    mid = tf.nn.relu(mid)
+    mid = tf.matmul(mid,var_dict['w4'])
+    mid = mid + var_dict['b5']
     return mid
 
 def get_choice(state_ph,var_dict):
@@ -50,13 +55,16 @@ def get_train(train_ph_dict,var_dict):
     mid1 = mid1 * tf.constant(TRAIN_BETA)
     
     mid = mid0-mid1-train_ph_dict['reward_1']
-    mid = tf.abs(mid)
+    mid = mid * mid
+#     mid = tf.abs(mid)
     mid = tf.reduce_mean(mid)
+    loss = mid
     mid = tf.train.GradientDescentOptimizer(0.5).minimize(mid)
+    train = mid
     
-    return mid
+    return train, loss
 
-TRAIN_MEMORY = 1000
+TRAIN_MEMORY = 10000
 
 class DeepLearn(object):
     
@@ -76,28 +84,30 @@ class DeepLearn(object):
         
         # train
         self.train_ph_dict = new_train_ph_dict()
-        self.train = get_train(self.train_ph_dict,self.var_dict)
+        self.train, self.loss = get_train(self.train_ph_dict,self.var_dict)
 
         self.sess = tf.Session()
         self.sess.run(tf.initialize_all_variables())
 
     def cal_choice(self, state_0):
         score, choice_0 = self.sess.run([self.score, self.choice],feed_dict={self.choice_state:[state_0]})
-        print(json.dumps([int(x*100) for x in score[0].tolist()]))
-        choice_0 = choice_0[0]
+        score = score[0].tolist()
+        choice_0 = choice_0.tolist()[0]
+        print("PWWRJCYQ pred "+json.dumps([int(x*100) for x in score]))
         return {
             'state_0': state_0,
             'choice_0': choice_0,
             'state_1': None,
             'cont': None,
             'reward_1': None,
-        }
+        }, score[choice_0]
 
     def push_train_dict(self, train_dict):
+        print("EECSQBUX push_train_dict: "+json.dumps(train_dict))
         for k, v in self.queue.items():
             v.append(train_dict[k])
 
-    def trainn(self):
+    def do_train(self):
         feed_dict={
             self.train_ph_dict['state_0']: list(self.queue['state_0']),
             self.train_ph_dict['choice_0']: list(self.queue['choice_0']),
@@ -105,4 +115,5 @@ class DeepLearn(object):
             self.train_ph_dict['cont']: list(self.queue['cont']),
             self.train_ph_dict['reward_1']: list(self.queue['reward_1']),
         }
-        self.sess.run(self.train,feed_dict=feed_dict)
+        _, loss = self.sess.run([self.train,self.loss],feed_dict=feed_dict)
+        print('ZPDDPYFD loss '+str(loss))

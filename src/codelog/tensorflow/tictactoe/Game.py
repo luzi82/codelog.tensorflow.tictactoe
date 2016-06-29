@@ -46,5 +46,5 @@ class Game(object):
             good = self.logic.action(cmd)
             retry = not good
             if not good:
-                print("bad action")
+                print("HLDUXMJC bad action")
 

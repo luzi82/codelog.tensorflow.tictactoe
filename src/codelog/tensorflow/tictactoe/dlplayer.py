@@ -13,15 +13,15 @@ def conv_status(status,side):
     return [[1 if c == side else 0 if c == None else -1 for c in cl] for cl in status.cell]
 
 ACTION_MAP = [
-    tttl.XY(2,0),
-    tttl.XY(2,1),
-    tttl.XY(2,2),
-    tttl.XY(1,0),
-    tttl.XY(1,1),
-    tttl.XY(1,2),
     tttl.XY(0,0),
     tttl.XY(0,1),
     tttl.XY(0,2),
+    tttl.XY(1,0),
+    tttl.XY(1,1),
+    tttl.XY(1,2),
+    tttl.XY(2,0),
+    tttl.XY(2,1),
+    tttl.XY(2,2),
 ]
 
 class DLPlayer(object):
@@ -41,7 +41,7 @@ class DLPlayer(object):
         train_dict['cont'] = 0
         train_dict['reward_1'] = 1 if status.winner == self.side else 0 if status.winner == None else -1
         self.dl.push_train_dict(train_dict)
-        self.dl.trainn()
+        self.dl.do_train()
         self.train_dict = None
         
     def input(self,status,retry):
@@ -52,10 +52,15 @@ class DLPlayer(object):
             train_dict['cont'] = 0 if retry else 1
             train_dict['reward_1'] = -10 if retry else -0.0001
             self.dl.push_train_dict(train_dict)
-            self.dl.trainn()
-        self.train_dict = self.dl.cal_choice(new_status)
-        if random.randrange(20) == 0:
+            self.dl.do_train()
+        self.train_dict, _ = self.dl.cal_choice(new_status)
+        print("GKPMPCLI choice: "+str(self.train_dict['choice_0']))
+#         use_chance = score + 1.0
+#         use_chance = min(use_chance,0.95)
+        use_chance = 0.95
+        if random.random() > use_chance:
             self.train_dict['choice_0'] = random.randrange(9)
+            print("KEKPIAXP random: "+str(self.train_dict['choice_0']))
         return ACTION_MAP[self.train_dict['choice_0']]
 
 if __name__ == '__main__':
