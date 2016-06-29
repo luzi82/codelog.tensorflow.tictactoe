@@ -1,5 +1,13 @@
 import codelog.tensorflow.tictactoe.Logic as tttl
 
+PIDCHAR = {tttl.Pid.O:'O',tttl.Pid.X:'X',None:' '}
+
+def printStatus(status):
+#     print("Winner: {}".format(PIDCHAR[status.winner]))
+    for cl in status.cell:
+        print ("".join(PIDCHAR[c] for c in cl))
+    print("Actor: {}".format(PIDCHAR[status.actor]))
+
 class Game(object):
 
     def __init__(self):
@@ -16,23 +24,27 @@ class Game(object):
     def turn(self):
         if self.logic == None:
             self.logic = tttl.Logic()
+            status = self.logic.getStatus()
             for _, player in self.playerDict.items():
-                player.new_game()
+                player.new_game(status)
             return
 
         status = self.logic.getStatus()
+        printStatus(status)
 
         if status.actor == None:
             for _, player in self.playerDict.items():
-                player.end_game(status.winner)
+                player.end_game(status)
             self.logic = None
             return
 
         activePlayer = self.playerDict[status.actor]
-        activePlayer.update_status(status)
         good = False
+        retry = False
         while not good:
-            cmd = activePlayer.input()
+            cmd = activePlayer.input(status,retry)
             good = self.logic.action(cmd)
-            activePlayer.input_ok(good)
+            retry = not good
+            if not good:
+                print("bad action")
 
