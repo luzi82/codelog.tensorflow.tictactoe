@@ -5,6 +5,7 @@ Created on Jun 5, 2016
 '''
 
 import codelog.tensorflow.tictactoe.Logic as tttl
+from codelog.tensorflow.tictactoe.Game import Game
 
 ACTION_MAP = {
     '1': tttl.XY(2,0),
@@ -21,23 +22,63 @@ ACTION_MAP = {
 PIDCHAR = {tttl.Pid.O:'O',tttl.Pid.X:'X',None:' '}
 
 def printStatus(status):
-    print("Winner: {}".format(PIDCHAR[status.winner]))
+#     print("Winner: {}".format(PIDCHAR[status.winner]))
     print("Actor: {}".format(PIDCHAR[status.actor]))
     for cl in status.cell:
         print ("".join(PIDCHAR[c] for c in cl))
 
-if __name__ == '__main__':
-    print("=======")
-    logic = tttl.Logic()
+class ConsolePlayer(object):
+
+    def __init__(self):
+        pass
+
+    def set_side(self,side):
+        self.side = side
+
+    def new_game(self):
+        print("NEW GAME")
     
-    while True:
-        status = logic.getStatus()
+    def end_game(self,winner):
+        print("Winner: {}".format(PIDCHAR[winner]))
+        
+    def update_status(self,status):
         printStatus(status)
         
-        print("=======")
-        if status.actor == None:
-            logic = tttl.Logic()
-        else:
+    def input(self):
+        while True:
             x = input("cmd")
             if x in ACTION_MAP:
-                logic.action(ACTION_MAP[x])
+                return ACTION_MAP[x]
+    
+    def input_ok(self,ok):
+        if not ok:
+            print("NOT OK")
+
+if __name__ == '__main__':
+    print("=======")
+    game = Game()
+    
+    po = ConsolePlayer()
+    po.set_side(tttl.Pid.O)
+
+    px = ConsolePlayer()
+    px.set_side(tttl.Pid.X)
+    
+    game.setPlayer(tttl.Pid.O, po)
+    game.setPlayer(tttl.Pid.X, px)
+    
+    game.run()
+    
+#     while True:
+#         status = logic.getStatus()
+#         printStatus(status)
+#         
+#         print("=======")
+#         if status.actor == None:
+#             logic = tttl.Logic()
+#         else:
+#             x = input("cmd")
+#             if x in ACTION_MAP:
+#                 ret = logic.action(ACTION_MAP[x])
+#                 if not ret:
+#                     print("CMD NOT GOOD")

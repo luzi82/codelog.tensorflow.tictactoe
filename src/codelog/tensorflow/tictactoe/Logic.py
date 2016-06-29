@@ -47,6 +47,8 @@ class Logic(object):
         else:
             self.actor = OPP[self.actor]
 
+        return True
+
     def checkWin(self,pid):
         for i in range(3):
             if self.checkCombo(pid, [XY(i,j) for j in range(3)] ):
