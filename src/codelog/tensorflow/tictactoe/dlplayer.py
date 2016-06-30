@@ -24,6 +24,12 @@ ACTION_MAP = [
     tttl.XY(2,2),
 ]
 
+REWARD_WIN = 0.9
+REWARD_LOSE = -0.9
+REWARD_DRAW = 0
+REWARD_STEP = -0.001
+REWARD_BAD = -1
+
 class DLPlayer(object):
 
     def __init__(self, dl):
@@ -39,7 +45,7 @@ class DLPlayer(object):
         train_dict = copy.copy(self.train_dict)
         train_dict['state_1'] = conv_status(status,self.side)
         train_dict['cont'] = 0
-        train_dict['reward_1'] = 1 if status.winner == self.side else 0 if status.winner == None else -1
+        train_dict['reward_1'] = REWARD_WIN if status.winner == self.side else REWARD_DRAW if status.winner == None else REWARD_LOSE
         self.dl.push_train_dict(train_dict)
         self.dl.do_train()
         self.train_dict = None
@@ -50,7 +56,7 @@ class DLPlayer(object):
             train_dict = copy.copy(self.train_dict)
             train_dict['state_1'] = new_status
             train_dict['cont'] = 0 if retry else 1
-            train_dict['reward_1'] = -10 if retry else -0.0001
+            train_dict['reward_1'] = REWARD_BAD if retry else REWARD_STEP
             self.dl.push_train_dict(train_dict)
             self.dl.do_train()
         self.train_dict, _ = self.dl.cal_choice(new_status)
@@ -76,4 +82,4 @@ if __name__ == '__main__':
     game.setPlayer(tttl.Pid.O, po)
     game.setPlayer(tttl.Pid.X, px)
     
-    game.run()
+    game.run(-1)

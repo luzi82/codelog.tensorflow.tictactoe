@@ -17,9 +17,13 @@ class Game(object):
     def setPlayer(self,side,player):
         self.playerDict[side] = player
 
-    def run(self):
-        while True:
-            self.turn()
+    def run(self,t):
+        if t < 0:
+            while True:
+                self.turn()
+        else:
+            for _ in range(t):
+                self.turn()
 
     def turn(self):
         if self.logic == None:

@@ -6,13 +6,14 @@ def new_state_ph():
     return tf.placeholder(tf.float32, [None,3,3])
 
 def new_var_dict():
+    stddev = 1
     ret = {}
-    ret['w0']=tf.Variable(tf.zeros([9,50],dtype=tf.float32))
-    ret['b1']=tf.Variable(tf.zeros([50],dtype=tf.float32))
-    ret['w2']=tf.Variable(tf.zeros([50,50],dtype=tf.float32))
-    ret['b3']=tf.Variable(tf.zeros([50],dtype=tf.float32))
-    ret['w4']=tf.Variable(tf.zeros([50,9],dtype=tf.float32))
-    ret['b5']=tf.Variable(tf.zeros([9],dtype=tf.float32))
+    ret['w0']=tf.Variable(tf.random_normal([9,50] ,stddev=stddev,dtype=tf.float32))
+    ret['b1']=tf.Variable(tf.random_normal([50]   ,stddev=stddev,dtype=tf.float32))
+    ret['w2']=tf.Variable(tf.random_normal([50,50],stddev=stddev,dtype=tf.float32))
+    ret['b3']=tf.Variable(tf.random_normal([50]   ,stddev=stddev,dtype=tf.float32))
+    ret['w4']=tf.Variable(tf.random_normal([50,9] ,stddev=stddev,dtype=tf.float32))
+    ret['b5']=tf.Variable(tf.random_normal([9]    ,stddev=stddev,dtype=tf.float32))
     return ret
 
 def new_train_ph_dict():
@@ -43,6 +44,11 @@ def get_choice(state_ph,var_dict):
     return score, choice
 
 TRAIN_BETA = 0.99
+ELEMENT_L2_FACTOR = 10.0
+L2_WEIGHT = 0.1
+
+def get_l2(m):
+    return tf.reduce_sum(m*m)
 
 def get_train(train_ph_dict,var_dict):
     mid0 = tf.one_hot(train_ph_dict['choice_0'], 9, axis=-1, dtype=tf.float32)
@@ -53,13 +59,25 @@ def get_train(train_ph_dict,var_dict):
     mid1 = tf.reduce_max(mid1, reduction_indices=[1])  
     mid1 = mid1 * train_ph_dict['cont']
     mid1 = mid1 * tf.constant(TRAIN_BETA)
+
+    l2r = tf.constant(0.0)
+    cell_count = tf.constant(0.0)
+    for v in var_dict.values():
+        l2r = l2r + get_l2(v)
+        cell_count = cell_count + tf.to_float(tf.size(v))
+    l2r = l2r / cell_count
+    l2r = l2r / tf.constant(ELEMENT_L2_FACTOR*ELEMENT_L2_FACTOR)
+    l2r = l2r * tf.constant(L2_WEIGHT)
     
     mid = mid0-mid1-train_ph_dict['reward_1']
-    mid = mid * mid
-#     mid = tf.abs(mid)
+#    mid = mid * mid
+    mid = tf.abs(mid)
     mid = tf.reduce_mean(mid)
+    mid = mid + l2r
+
     loss = mid
-    mid = tf.train.GradientDescentOptimizer(0.5).minimize(mid)
+
+    mid = tf.train.GradientDescentOptimizer(0.5).minimize(mid,var_list=var_dict.values())
     train = mid
     
     return train, loss
@@ -108,6 +126,8 @@ class DeepLearn(object):
             v.append(train_dict[k])
 
     def do_train(self):
+        if len(self.queue['state_0']) < 100:
+            return
         feed_dict={
             self.train_ph_dict['state_0']: list(self.queue['state_0']),
             self.train_ph_dict['choice_0']: list(self.queue['choice_0']),
