@@ -26,6 +26,7 @@ class Game(object):
                 self.turn()
 
     def turn(self):
+        print('=====')
         if self.logic == None:
             self.logic = tttl.Logic()
             status = self.logic.getStatus()

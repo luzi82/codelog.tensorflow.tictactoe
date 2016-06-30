@@ -7,7 +7,6 @@ import copy
 from codelog.tensorflow.tictactoe.Game import Game
 from codelog.tensorflow.tictactoe import DeepLearn
 import codelog.tensorflow.tictactoe.Logic as tttl
-import random
 
 def conv_status(status,side):
     return [[1 if c == side else 0 if c == None else -1 for c in cl] for cl in status.cell]
@@ -51,6 +50,10 @@ class DLPlayer(object):
         self.train_dict = None
         
     def input(self,status,retry):
+        if not retry:
+            self.mask = [1.0]*9
+        else:
+            self.mask[self.train_dict['choice_0']] = 0.0
         new_status = conv_status(status,self.side)
         if self.train_dict != None:
             train_dict = copy.copy(self.train_dict)
@@ -59,14 +62,14 @@ class DLPlayer(object):
             train_dict['reward_1'] = REWARD_BAD if retry else REWARD_STEP
             self.dl.push_train_dict(train_dict)
             self.dl.do_train()
-        self.train_dict, _ = self.dl.cal_choice(new_status)
+        self.train_dict, _ = self.dl.cal_choice(new_status,self.mask)
         print("GKPMPCLI choice: "+str(self.train_dict['choice_0']))
 #         use_chance = score + 1.0
 #         use_chance = min(use_chance,0.95)
-        use_chance = 0.95
-        if random.random() > use_chance:
-            self.train_dict['choice_0'] = random.randrange(9)
-            print("KEKPIAXP random: "+str(self.train_dict['choice_0']))
+#         use_chance = 0.95
+#         if random.random() > use_chance:
+#             self.train_dict['choice_0'] = random.randrange(9)
+#             print("KEKPIAXP random: "+str(self.train_dict['choice_0']))
         return ACTION_MAP[self.train_dict['choice_0']]
 
 if __name__ == '__main__':
