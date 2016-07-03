@@ -5,7 +5,7 @@ Created on 29 Jun 2016
 '''
 import copy
 from codelog.tensorflow.tictactoe.Game import Game
-from codelog.tensorflow.tictactoe import DeepLearn
+from codelog.tensorflow.tictactoe import deeplearn0 as deeplearn
 import codelog.tensorflow.tictactoe.Logic as tttl
 
 def conv_status(status,side):
@@ -74,7 +74,7 @@ class DLPlayer(object):
 
 if __name__ == '__main__':
     game = Game()
-    dl = DeepLearn.DeepLearn()
+    dl = deeplearn.DeepLearn()
     
     po = DLPlayer(dl)
     po.set_side(tttl.Pid.O)
