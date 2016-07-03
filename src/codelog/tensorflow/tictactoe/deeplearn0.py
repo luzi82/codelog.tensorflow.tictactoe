@@ -1,7 +1,9 @@
 import tensorflow as tf
 from collections import deque 
 import json
-import math
+import time, os
+
+MY_NAME = __name__[__name__.rfind('.')+1:]
 
 OUTPUT_COUNT = 9
 RANDOM_STDDEV = 0.1
@@ -121,6 +123,10 @@ class DeepLearn(object):
 
         self.sess = tf.Session()
         self.sess.run(tf.initialize_all_variables())
+        
+        self.train_count = 0
+        self.saver = tf.train.Saver()
+        self.timestamp = int(time.time())
 
     def cal_choice(self, state_0, mask):
         score, choice_0 = self.sess.run([self.score, self.train_choice],feed_dict={self.choice_state:[state_0],self.mask:[mask]})
@@ -152,3 +158,7 @@ class DeepLearn(object):
         }
         _, loss, score_diff = self.sess.run([self.train,self.loss,self.score_diff],feed_dict=feed_dict)
         print('ZPDDPYFD loss '+str(loss)+' '+str(score_diff))
+        self.train_count += 1
+        if self.train_count % 100000 == 0:
+            os.makedirs("sess/{}/{}".format(MY_NAME,self.timestamp),exist_ok=True)
+            self.saver.save(self.sess,"sess/{}/{}/{}.ckpt".format(MY_NAME,self.timestamp,self.train_count))
