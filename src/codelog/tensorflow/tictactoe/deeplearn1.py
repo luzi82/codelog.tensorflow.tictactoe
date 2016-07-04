@@ -167,3 +167,4 @@ class DeepLearn(object):
         if self.train_count % 1000000 == 0:
             os.makedirs("sess/{}/{}".format(MY_NAME,self.timestamp),exist_ok=True)
             self.saver.save(self.sess,"sess/{}/{}/{}.ckpt".format(MY_NAME,self.timestamp,self.train_count))
+	print('HZQQMSQT '+__name__)
