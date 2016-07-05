@@ -159,6 +159,7 @@ class DeepLearn(object):
         _, loss, score_diff = self.sess.run([self.train,self.loss,self.score_diff],feed_dict=feed_dict)
         print('ZPDDPYFD loss '+str(loss)+' '+str(score_diff))
         self.train_count += 1
-        if self.train_count % 100000 == 0:
+        if self.train_count % 1000 == 0:
             os.makedirs("sess/{}/{}".format(MY_NAME,self.timestamp),exist_ok=True)
             self.saver.save(self.sess,"sess/{}/{}/{}.ckpt".format(MY_NAME,self.timestamp,self.train_count))
+        print('HZQQMSQT '+__name__)
