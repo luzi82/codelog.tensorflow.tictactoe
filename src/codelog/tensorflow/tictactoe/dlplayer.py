@@ -33,6 +33,7 @@ class DLPlayer(object):
 
     def __init__(self, dl):
         self.dl = dl
+        self.train_enable = True
     
     def set_side(self,side):
         self.side = side
@@ -40,14 +41,18 @@ class DLPlayer(object):
     def new_game(self,status):
         self.train_dict = None
     
+    def set_train_enable(self,train_enable):
+        self.train_enable = train_enable
+    
     def end_game(self,status):
-        train_dict = copy.copy(self.train_dict)
-        train_dict['state_1'] = conv_status(status,self.side)
-        train_dict['cont'] = 0
-        train_dict['reward_1'] = REWARD_WIN if status.winner == self.side else REWARD_DRAW if status.winner == None else REWARD_LOSE
-        self.dl.push_train_dict(train_dict)
-        self.dl.do_train()
-        self.train_dict = None
+        if self.train_enable:
+            train_dict = copy.copy(self.train_dict)
+            train_dict['state_1'] = conv_status(status,self.side)
+            train_dict['cont'] = 0
+            train_dict['reward_1'] = REWARD_WIN if status.winner == self.side else REWARD_DRAW if status.winner == None else REWARD_LOSE
+            self.dl.push_train_dict(train_dict)
+            self.dl.do_train()
+            self.train_dict = None
         
     def input(self,status,retry):
         if not retry:

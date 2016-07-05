@@ -31,6 +31,11 @@ class Logic(object):
         status.actor = self.actor
         status.cell = copy.deepcopy(self.cell)
         return status
+    
+    def set_status(self,status):
+        self.winner = status.winner
+        self.actor = status.actor
+        self.cell = copy.deepcopy(status.cell)
 
     def action(self,pos):
         if self.cell[pos.x][pos.y] != None:
