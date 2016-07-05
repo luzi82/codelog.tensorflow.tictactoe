@@ -1,9 +1,9 @@
 import tensorflow as tf
 from collections import deque 
 import json
-import time, os
+import math
 
-MY_NAME = __name__[__name__.rfind('.')+1:]
+PHI = (math.sqrt(5.)+1.)/2.
 
 OUTPUT_COUNT = 9
 RANDOM_STDDEV = 0.1
@@ -41,15 +41,13 @@ def get_q(state_ph,var_dict):
     mid = state_ph
     mid = tf.reshape(mid, [-1,9])
     mid = tf.matmul(mid,var_dict['w0'])
-    mid = mid + var_dict['b1']
-    mid = tf.maximum(mid, -1.0)
-    mid = tf.minimum(mid, 1.0)
+    mid = mid + var_dict['b1'] * (1./9./PHI)
+    mid = tf.nn.elu(mid)
     mid = tf.matmul(mid,var_dict['w2'])
-    mid = mid + var_dict['b3']
-    mid = tf.maximum(mid, -1.0)
-    mid = tf.minimum(mid, 1.0)
+    mid = mid + var_dict['b3'] * (1./50./PHI)
+    mid = tf.nn.elu(mid)
     mid = tf.matmul(mid,var_dict['w4'])
-    mid = mid + var_dict['b5'] * tf.constant(0.05)
+    mid = mid + var_dict['b5'] * (1./50./PHI)
     return mid
 
 def get_train_choice(state_ph,var_dict,random_t,mask):
@@ -130,10 +128,6 @@ class DeepLearn(object):
 
         self.sess = tf.Session()
         self.sess.run(tf.initialize_all_variables())
-        
-        self.train_count = 0
-        self.saver = tf.train.Saver(max_to_keep=None)
-        self.timestamp = int(time.time())
 
     def cal_choice(self, state_0, mask):
         score, choice_0 = self.sess.run([self.score, self.train_choice],feed_dict={self.choice_state:[state_0],self.mask:[mask]})
@@ -163,8 +157,3 @@ class DeepLearn(object):
             feed_dict[self.var_ph_dict[k]] = self.var_dict[k].eval(self.sess)
         _, loss, score_diff = self.sess.run([self.train,self.loss,self.score_diff],feed_dict=feed_dict)
         print('ZPDDPYFD loss '+str(loss)+' '+str(score_diff))
-        self.train_count += 1
-        if self.train_count % 1000 == 0:
-            os.makedirs("sess/{}/{}".format(MY_NAME,self.timestamp),exist_ok=True)
-            self.saver.save(self.sess,"sess/{}/{}/{}.ckpt".format(MY_NAME,self.timestamp,self.train_count))
-        print('HZQQMSQT '+__name__)
