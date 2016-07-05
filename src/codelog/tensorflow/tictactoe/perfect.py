@@ -1,4 +1,6 @@
 from codelog.tensorflow.tictactoe import Logic as tl
+from codelog.tensorflow.tictactoe import Game as tg
+import random, json
 
 ACTION_DICT = [
     tl.XY(0,0),
@@ -12,38 +14,58 @@ ACTION_DICT = [
     tl.XY(2,2),
 ]
 
-# choice, must_win, may_win, must_lose, may_lose
+CAL_MIN_MAX_DICT={}
+
+def status_key(status,actor):
+    ret = []
+    for cl in status.cell:
+        for c in cl:
+            ret.append(int(c)if c != None else 0)
+    ret.append(int(actor))
+    ret = json.dumps(ret)
+    return ret
+
+# choice, score
 def cal_min_max(status,actor):
-    ret = None
+    k = status_key(status,actor)
+    if k in CAL_MIN_MAX_DICT:
+        return CAL_MIN_MAX_DICT[k][0], CAL_MIN_MAX_DICT[k][1]
     
+    #tg.printStatus(status)
     if status.actor == None:
         if status.winner == actor:
-            return None, True, True, False, False
+            return [], 1
         elif status.winner == None:
-            return None, False, False, False, False
+            return [], 0
         else:
-            return None, False, False, True, True
+            return [], -1
     
-    must_win = True
-    may_win = False
-    must_lose = True
-    may_lose = False
-    move_score = -999
-    move_list = None
+    ret_score = -999
+    ret_choice_list = None
+
+    logic = tl.Logic()
 
     for action in ACTION_DICT:
-        logic = tl.Logic()
         logic.set_status(status)
         if not logic.action(action):
             continue
-        
+        new_status = logic.getStatus()
+        _, s = cal_min_max(new_status,tl.OPP[actor])
+        s *= -1
+        if s > ret_score:
+            ret_score = s
+            ret_choice_list = [action]
+        elif s == ret_score:
+            ret_choice_list.append(action)
     
-    return move_list, must_win, may_win, must_lose, may_lose
+    CAL_MIN_MAX_DICT[k] = [ret_choice_list,ret_score]
+    
+    return ret_choice_list, ret_score
 
 class Player(object):
 
-    def __init__(self, dl):
-        self.dl = dl
+    def __init__(self):
+        self.side = None
     
     def set_side(self,side):
         self.side = side
@@ -52,7 +74,23 @@ class Player(object):
         pass
     
     def end_game(self,status):
-        pass
+        if status.winner == tl.OPP[self.side]:
+            raise Exception('FTIRAQKFKT')
         
     def input(self,status,retry):
-        return cal_min_max(status)
+        choice_list, _ = cal_min_max(status,self.side)
+        return random.choice(choice_list)
+
+if __name__ == '__main__':
+    game = tg.Game()
+    
+    po = Player()
+    po.set_side(tl.Pid.O)
+
+    px = Player()
+    px.set_side(tl.Pid.X)
+    
+    game.setPlayer(tl.Pid.O, po)
+    game.setPlayer(tl.Pid.X, px)
+    
+    game.run(-1)

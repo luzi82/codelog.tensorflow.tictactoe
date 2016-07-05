@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 import copy
 
 class XY(object):
@@ -6,7 +6,7 @@ class XY(object):
         self.x=x
         self.y=y
 
-class Pid(Enum):
+class Pid(IntEnum):
     O = -1
     X = 1
 
