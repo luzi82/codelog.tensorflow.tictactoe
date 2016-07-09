@@ -125,7 +125,7 @@ class DeepLearn(object):
         self.sess.run(tf.initialize_all_variables())
         
         self.train_count = 0
-        self.saver = tf.train.Saver(max_to_keep=None)
+        self.saver = tf.train.Saver(self.var_dict,max_to_keep=None)
         self.timestamp = int(time.time())
         
     def load_sess(self,filename):
@@ -152,13 +152,9 @@ class DeepLearn(object):
     def do_train(self):
         if len(self.queue['state_0']) < 100:
             return
-        feed_dict={
-            self.train_ph_dict['state_0']: list(self.queue['state_0']),
-            self.train_ph_dict['choice_0']: list(self.queue['choice_0']),
-            self.train_ph_dict['state_1']: list(self.queue['state_1']),
-            self.train_ph_dict['cont']: list(self.queue['cont']),
-            self.train_ph_dict['reward_1']: list(self.queue['reward_1']),
-        }
+        feed_dict = {}
+        for k in self.train_ph_dict:
+            feed_dict[self.train_ph_dict[k]] = list(self.queue[k])
         _, loss, score_diff = self.sess.run([self.train,self.loss,self.score_diff],feed_dict=feed_dict)
         print('ZPDDPYFD loss '+str(loss)+' '+str(score_diff))
         self.train_count += 1

@@ -132,8 +132,11 @@ class DeepLearn(object):
         self.sess.run(tf.initialize_all_variables())
         
         self.train_count = 0
-        self.saver = tf.train.Saver(max_to_keep=None)
+        self.saver = tf.train.Saver(self.var_dict,max_to_keep=None)
         self.timestamp = int(time.time())
+        
+    def load_sess(self,filename):
+        self.saver.restore(self.sess, filename)
 
     def cal_choice(self, state_0, mask):
         score, choice_0 = self.sess.run([self.score, self.train_choice],feed_dict={self.choice_state:[state_0],self.mask:[mask]})
