@@ -7,6 +7,7 @@ MY_NAME = __name__[__name__.rfind('.')+1:]
 
 OUTPUT_COUNT = 9
 RANDOM_STDDEV = 0.1
+LEARNING_RATE = 0.01
 
 def new_state_ph():
     return tf.placeholder(tf.float32, [None,3,3])
@@ -92,7 +93,7 @@ def get_train(train_ph_dict,var_dict):
 
     loss = mid
 
-    mid = tf.train.GradientDescentOptimizer(0.5).minimize(mid,var_list=var_dict.values())
+    mid = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(mid,var_list=var_dict.values())
     train = mid
     
     return train, loss, score_diff
