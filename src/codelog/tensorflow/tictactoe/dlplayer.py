@@ -94,4 +94,4 @@ if __name__ == '__main__':
     game.setPlayer(tttl.Pid.O, po)
     game.setPlayer(tttl.Pid.X, px)
     
-    game.run(-1)
+    game.run()
