@@ -78,8 +78,13 @@ class Player(object):
             raise Exception('FTIRAQKFKT')
         
     def input(self,status,retry):
+        if retry:
+            raise Exception('FLSTQLRK')
         choice_list, _ = cal_min_max(status,self.side)
         return random.choice(choice_list)
+
+    def close(self):
+        pass
 
 if __name__ == '__main__':
     game = tg.Game()

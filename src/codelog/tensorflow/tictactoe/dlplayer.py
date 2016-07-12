@@ -60,13 +60,14 @@ class DLPlayer(object):
         else:
             self.mask[self.train_dict['choice_0']] = 0.0
         new_status = conv_status(status,self.side)
-        if self.train_dict != None:
-            train_dict = copy.copy(self.train_dict)
-            train_dict['state_1'] = new_status
-            train_dict['cont'] = 0 if retry else 1
-            train_dict['reward_1'] = REWARD_BAD if retry else REWARD_STEP
-            self.dl.push_train_dict(train_dict)
-            self.dl.do_train()
+        if self.train_enable:
+            if self.train_dict != None:
+                train_dict = copy.copy(self.train_dict)
+                train_dict['state_1'] = new_status
+                train_dict['cont'] = 0 if retry else 1
+                train_dict['reward_1'] = REWARD_BAD if retry else REWARD_STEP
+                self.dl.push_train_dict(train_dict)
+                self.dl.do_train()
         self.train_dict, _ = self.dl.cal_choice(new_status,self.mask)
         print("GKPMPCLI choice: "+str(self.train_dict['choice_0']))
 #         use_chance = score + 1.0
@@ -76,6 +77,9 @@ class DLPlayer(object):
 #             self.train_dict['choice_0'] = random.randrange(9)
 #             print("KEKPIAXP random: "+str(self.train_dict['choice_0']))
         return ACTION_MAP[self.train_dict['choice_0']]
+
+    def close(self):
+        self.dl.close()
 
 if __name__ == '__main__':
     game = Game()

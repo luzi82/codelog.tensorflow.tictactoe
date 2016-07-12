@@ -13,16 +13,23 @@ class Game(object):
     def __init__(self):
         self.logic = None
         self.playerDict = {}
+        self.win_count_dict = {k:0 for k in list(tttl.Pid)}
+        self.win_count_dict[None] = 0
+        self.bad_move_count_dict = {k:0 for k in list(tttl.Pid)}
+        self.game_done_count = 0
 
     def setPlayer(self,side,player):
         self.playerDict[side] = player
 
-    def run(self,t):
-        if t < 0:
-            while True:
+    def run(self,turn_count=None,game_count=None):
+        if turn_count != None:
+            for _ in range(turn_count):
+                self.turn()
+        elif game_count != None:
+            while self.game_done_count < game_count:
                 self.turn()
         else:
-            for _ in range(t):
+            while True:
                 self.turn()
 
     def turn(self):
@@ -41,6 +48,8 @@ class Game(object):
             for _, player in self.playerDict.items():
                 player.end_game(status)
             self.logic = None
+            self.win_count_dict[status.winner] += 1
+            self.game_done_count = self.game_done_count + 1
             return
 
         activePlayer = self.playerDict[status.actor]
@@ -52,4 +61,11 @@ class Game(object):
             retry = not good
             if not good:
                 print("HLDUXMJC bad action")
+                self.bad_move_count_dict[status.actor] += 1
 
+    def result(self):
+        return {
+            'win_count_dict':{(k.name if k!=None else "null"):v for k,v in self.win_count_dict.items()},
+            'bad_move_count_dict':{k.name:v for k,v in self.bad_move_count_dict.items()},
+            'game_done_count':self.game_done_count
+        }
