@@ -78,6 +78,12 @@ class DLPlayer(object):
 #             print("KEKPIAXP random: "+str(self.train_dict['choice_0']))
         return ACTION_MAP[self.train_dict['choice_0']]
 
+    def update_status(self,status):
+        pass
+
+    def turn_end(self):
+        pass
+
     def close(self):
         self.dl.close()
 

@@ -52,6 +52,9 @@ class Game(object):
             self.game_done_count = self.game_done_count + 1
             return
 
+        for _, player in self.playerDict.items():
+            player.update_status(status)
+
         activePlayer = self.playerDict[status.actor]
         good = False
         retry = False
@@ -62,6 +65,9 @@ class Game(object):
             if not good:
                 print("HLDUXMJC bad action")
                 self.bad_move_count_dict[status.actor] += 1
+
+        for _, player in self.playerDict.items():
+            player.turn_end()
 
     def result(self):
         return {
