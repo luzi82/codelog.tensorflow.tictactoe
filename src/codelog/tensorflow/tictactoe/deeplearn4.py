@@ -1,4 +1,4 @@
-# clone of deeplearn 4
+# clone of deeplearn 3
 # use elu
 
 import tensorflow as tf
