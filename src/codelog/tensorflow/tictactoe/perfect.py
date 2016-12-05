@@ -70,9 +70,15 @@ class Player(object):
     def set_side(self,side):
         self.side = side
 
+    def turn_start(self,status):
+        pass
+
     def new_game(self,status):
         pass
-    
+
+    def update_status(self,status):
+        pass
+
     def end_game(self,status):
         if status.winner == tl.OPP[self.side]:
             raise Exception('FTIRAQKFKT')
@@ -82,6 +88,9 @@ class Player(object):
             raise Exception('FLSTQLRK')
         choice_list, _ = cal_min_max(status,self.side)
         return random.choice(choice_list)
+
+    def turn_end(self,status):
+        pass
 
     def close(self):
         pass

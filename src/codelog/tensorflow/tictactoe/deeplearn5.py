@@ -9,8 +9,10 @@ import copy
 from codelog.tensorflow.tictactoe import dlplayer
 from codelog.tensorflow.tictactoe.Game import Game
 import codelog.tensorflow.tictactoe.Logic as tttl
+import sys
 
-MY_NAME = __name__[__name__.rfind('.')+1:]
+MY_FILENAME = (os.path.basename(sys.modules['__main__'].__file__))
+MY_NAME = MY_FILENAME[:-3] # remove .py
 
 OUTPUT_COUNT = 9
 RANDOM_STDDEV = 0.1
@@ -175,7 +177,7 @@ class DeepLearn(object):
         if self.train_count % 1000 == 0:
             os.makedirs("sess/{}/{}".format(MY_NAME,self.timestamp),exist_ok=True)
             self.saver.save(self.sess,"sess/{}/{}/{}.ckpt".format(MY_NAME,self.timestamp,self.train_count))
-        print('HZQQMSQT '+__name__+' '+str(self.train_count))
+        print('HZQQMSQT '+MY_NAME+' '+str(self.train_count))
 
     def close(self):
         self.sess.close()
@@ -242,25 +244,26 @@ class DLPlayer(object):
         return dlplayer.ACTION_MAP[choice]
 
     def turn_end(self,status):
-        if self.last_choice != None:
-            if status.actor == None:
-                reward = REWARD_WIN if status.winner == self.side \
-                    else REWARD_DRAW if status.winner == None \
-                    else REWARD_LOSE
-                train_dict = copy.copy(self.train_dict)
-                train_dict['state_1'] = train_dict['state_0']
-                train_dict['cont'] = 0
-                train_dict['reward_1'] = reward
-                self.dl.push_train_dict(train_dict)
-                self.dl.do_train()
-            else:
-                new_status = dlplayer.conv_status(status,tttl.OPP[self.side])
-                train_dict = copy.copy(self.train_dict)
-                train_dict['state_1'] = new_status
-                train_dict['cont'] = 1
-                train_dict['reward_1'] = REWARD_STEP
-                self.dl.push_train_dict(train_dict)
-                self.dl.do_train()
+        if self.train_enable:
+            if self.last_choice != None:
+                if status.actor == None:
+                    reward = REWARD_WIN if status.winner == self.side \
+                        else REWARD_DRAW if status.winner == None \
+                        else REWARD_LOSE
+                    train_dict = copy.copy(self.train_dict)
+                    train_dict['state_1'] = train_dict['state_0']
+                    train_dict['cont'] = 0
+                    train_dict['reward_1'] = reward
+                    self.dl.push_train_dict(train_dict)
+                    self.dl.do_train()
+                else:
+                    new_status = dlplayer.conv_status(status,tttl.OPP[self.side])
+                    train_dict = copy.copy(self.train_dict)
+                    train_dict['state_1'] = new_status
+                    train_dict['cont'] = 1
+                    train_dict['reward_1'] = REWARD_STEP
+                    self.dl.push_train_dict(train_dict)
+                    self.dl.do_train()
 
         self.legit_mask = None
         self.train_dict = None

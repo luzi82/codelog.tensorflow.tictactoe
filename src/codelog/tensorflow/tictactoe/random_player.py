@@ -23,9 +23,15 @@ class Player(object):
     def set_side(self,side):
         pass
 
+    def turn_start(self,status):
+        pass
+
     def new_game(self,status):
         pass
     
+    def update_status(self,status):
+        pass
+
     def end_game(self,status):
         pass
         
@@ -37,6 +43,9 @@ class Player(object):
             if status.cell[action.x][action.y] == None:
                 available_action_list.append(action)
         return random.choice(available_action_list)
+
+    def turn_end(self,status):
+        pass
 
     def close(self):
         pass

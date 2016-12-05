@@ -3,6 +3,7 @@ from codelog.tensorflow.tictactoe import Game as tg
 from codelog.tensorflow.tictactoe import perfect, random_player, dlplayer
 from codelog.tensorflow.tictactoe import Logic as tl
 from codelog.tensorflow.tictactoe import deeplearn0 as dl0, deeplearn1 as dl1
+from codelog.tensorflow.tictactoe import deeplearn5 as dl5
 import json, time, os
 
 def vs(player_o,player_x,game_count):
@@ -35,6 +36,12 @@ def create_player(param_dict):
         ret = dlplayer.DLPlayer(dl)
         ret.set_train_enable(False)
         return ret
+    if param_dict['type'] == 'dl5':
+        dl = dl5.DeepLearn()
+        dl.load_sess(param_dict['filename'])
+        ret = dl5.DLPlayer(dl)
+        ret.set_train_enable(False)
+        return ret
     return None
 
 def run_vs_dict(vs_dict):
@@ -53,14 +60,9 @@ if __name__ == '__main__':
 
     vs_dict_meta_list = [
         {
-            'name':'0','type':'dl0',
+            'name':'5','type':'dl5',
             'count':600,'step':1000,
-            'filename_format':'sess/dl0/{}.ckpt',
-        },
-        {
-            'name':'1','type':'dl1',
-            'count':600,'step':1000,
-            'filename_format':'sess/dl1/{}.ckpt',
+            'filename_format':'sess/deeplearn5/1480775657/{}.ckpt',
         }
     ]
 
@@ -73,32 +75,32 @@ if __name__ == '__main__':
     })
     vs_dict_list.append({
         'name':'rp',
-        'O':{'type':'perfect'},
         'X':{'type':'random'},
+        'O':{'type':'perfect'},
     })
 
     for vs_dict_meta in vs_dict_meta_list:
         for i in range(vs_dict_meta['count']):
             filename = vs_dict_meta['filename_format'].format((i+1)*vs_dict_meta['step'])
             vs_dict_list.append({
-                'name':'p{}'.format(vs_dict_meta['name']),'itr':i,
+                'name':'{}p'.format(vs_dict_meta['name']),'itr':i,
                 'X':{'type':vs_dict_meta['type'],'filename':filename},
                 'O':{'type':'perfect'},
             })
             vs_dict_list.append({
-                'name':'{}p'.format(vs_dict_meta['name']),'itr':i,
-                'O':{'type':vs_dict_meta['type'],'filename':filename},
+                'name':'p{}'.format(vs_dict_meta['name']),'itr':i,
                 'X':{'type':'perfect'},
+                'O':{'type':vs_dict_meta['type'],'filename':filename},
             })
             vs_dict_list.append({
-                'name':'r{}'.format(vs_dict_meta['name']),'itr':i,
+                'name':'{}r'.format(vs_dict_meta['name']),'itr':i,
                 'X':{'type':vs_dict_meta['type'],'filename':filename},
                 'O':{'type':'random'},
             })
             vs_dict_list.append({
-                'name':'{}r'.format(vs_dict_meta['name']),'itr':i,
-                'O':{'type':vs_dict_meta['type'],'filename':filename},
+                'name':'r{}'.format(vs_dict_meta['name']),'itr':i,
                 'X':{'type':'random'},
+                'O':{'type':vs_dict_meta['type'],'filename':filename},
             })
 
     result_list = []
