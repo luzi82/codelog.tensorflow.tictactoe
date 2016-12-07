@@ -12,17 +12,17 @@ ITR_COUNT = 600
 if __name__ == '__main__':
 
     data_dict = {}
-    with open('output/dlcompare/1480838067.json','r') as in_file:
+    with open('output/dlcompare/1481042161.json','r') as in_file:
         result_list = json.load(in_file)
 
     win_key_list = [
-        {'type':'win','name':'p5','win':'X','style':'ro'},
-        {'type':'win','name':'5p','win':'O','style':'rx'},
-        {'type':'win','name':'r5','win':'O','style':'go'},
-        {'type':'win','name':'5r','win':'X','style':'gx'},
-        {'type':'win','name':'r5','win':'X','style':'bo'},
-        {'type':'win','name':'5r','win':'O','style':'bx'},
-        {'type':'badmove','name':'dl5','style':'k+'},
+        {'type':'win','name':'p6','win':'X','style':'ro'},
+        {'type':'win','name':'6p','win':'O','style':'rx'},
+        {'type':'win','name':'r6','win':'O','style':'go'},
+        {'type':'win','name':'6r','win':'X','style':'gx'},
+        {'type':'win','name':'r6','win':'X','style':'bo'},
+        {'type':'win','name':'6r','win':'O','style':'bx'},
+        {'type':'badmove','name':'dl0006','style':'k+'},
     ]
     for win_key in win_key_list:
         if win_key['type'] == 'win':
@@ -52,6 +52,8 @@ if __name__ == '__main__':
                     data_dict[name]['data'][result['input']['itr']] += result['result']['bad_move_count_dict']['X']
                 if result['input']['O']['type'] == win_key['name']:
                     data_dict[name]['data'][result['input']['itr']] += result['result']['bad_move_count_dict']['O']
+#             for itr in range(len(data_dict[name]['data'])):
+#                 data_dict[name]['data'][itr] = min(data_dict[name]['data'][itr],1000)
         plt.ylim(0,1000)
         plt.plot(range(ITR_COUNT),data_dict[name]['data'],win_key['style'])
 
