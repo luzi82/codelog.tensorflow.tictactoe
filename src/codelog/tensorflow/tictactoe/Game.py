@@ -58,14 +58,13 @@ class Game(object):
         else :
             activePlayer = self.playerDict[status.actor]
             good = False
-            retry = False
             while not good:
-                cmd = activePlayer.input(status,retry)
+                cmd = activePlayer.input(status)
                 good = self.logic.action(cmd)
-                retry = not good
                 if not good:
                     print("HLDUXMJC bad action")
                     self.bad_move_count_dict[status.actor] += 1
+                    activePlayer.input_error()
 
         status = None if self.logic == None else self.logic.getStatus()
         for _, player in self.playerDict.items():

@@ -35,14 +35,15 @@ class Player(object):
     def end_game(self,status):
         pass
         
-    def input(self,status,retry):
-        if retry:
-            raise Exception('IOULLYLL')
+    def input(self,status):
         available_action_list = []
         for action in ACTION_LIST:
             if status.cell[action.x][action.y] == None:
                 available_action_list.append(action)
         return random.choice(available_action_list)
+
+    def input_error(self):
+        raise Exception('IOULLYLL')
 
     def turn_end(self,status):
         pass
