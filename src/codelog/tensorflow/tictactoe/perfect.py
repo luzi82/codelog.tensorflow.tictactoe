@@ -83,11 +83,12 @@ class Player(object):
         if status.winner == tl.OPP[self.side]:
             raise Exception('FTIRAQKFKT')
         
-    def input(self,status,retry):
-        if retry:
-            raise Exception('FLSTQLRK')
+    def input(self,status):
         choice_list, _ = cal_min_max(status,self.side)
         return random.choice(choice_list)
+    
+    def input_error(self):
+        raise Exception('FLSTQLRK')
 
     def turn_end(self,status):
         pass
