@@ -5,6 +5,7 @@ from codelog.tensorflow.tictactoe import Logic as tl
 from codelog.tensorflow.tictactoe import deeplearn0 as dl0, deeplearn1 as dl1
 from codelog.tensorflow.tictactoe import deeplearn5 as dl5
 from codelog.tensorflow.tictactoe import deeplearn0006
+from codelog.tensorflow.tictactoe import deeplearn0007
 import json, time, os
 
 def vs(player_o,player_x,game_count):
@@ -49,6 +50,12 @@ def create_player(param_dict):
         ret = deeplearn0006.DLPlayer(dl)
         ret.set_train_enable(False)
         return ret
+    if param_dict['type'] == 'dl0007':
+        dl = deeplearn0007.DeepLearn()
+        dl.load_sess(param_dict['filename'])
+        ret = deeplearn0007.DLPlayer(dl)
+        ret.set_train_enable(False)
+        return ret
     return None
 
 def run_vs_dict(vs_dict):
@@ -67,9 +74,9 @@ if __name__ == '__main__':
 
     vs_dict_meta_list = [
         {
-            'name':'6','type':'dl0006',
+            'name':'7','type':'dl0007',
             'count':1000,'step':1000,
-            'filename_format':'sess/deeplearn0006/1480903187/{}.ckpt',
+            'filename_format':'sess/deeplearn0007/1481079959/{}.ckpt',
         }
     ]
 
