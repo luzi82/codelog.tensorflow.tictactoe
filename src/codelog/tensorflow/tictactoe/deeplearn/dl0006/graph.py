@@ -6,6 +6,7 @@ Created on Jul 12, 2016
 
 import json
 import matplotlib.pyplot as plt
+from builtins import range
 
 ITR_COUNT = 600
 

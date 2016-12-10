@@ -13,6 +13,7 @@ import codelog.tensorflow.tictactoe.Logic as tttl
 import random
 import logging
 import argparse
+from codelog.tensorflow.tictactoe import py23
 
 MY_NAME = os.path.basename(os.path.dirname(__file__))
 
@@ -192,7 +193,7 @@ class DeepLearn(object):
         self.train_count += 1
         if self.train_count % 1000 == 0:
             output_file_name = "{}/sess/{}.ckpt".format(self.arg_dict['output_path'],self.train_count)
-            os.makedirs(os.path.dirname(output_file_name),exist_ok=True)
+            py23.makedirs(os.path.dirname(output_file_name),exist_ok=True)
             self.saver.save(self.sess,output_file_name)
             logging.info('CLPNAVGR save session: {}'.format(output_file_name))
         logging.debug('HZQQMSQT '+MY_NAME+' '+str(self.train_count))
@@ -350,7 +351,7 @@ def main(_):
         timestamp = int(time.time())
         arg_dict['output_path'] = 'output/{}/deeplearn/{}'.format(MY_NAME, timestamp)
     
-    os.makedirs(arg_dict['output_path'],exist_ok=True)
+    py23.makedirs(arg_dict['output_path'],exist_ok=True)
     with open('{}/input_arg_dict.json'.format(arg_dict['output_path']),'w') as out_file:
         json.dump(arg_dict,out_file)
 
@@ -370,5 +371,5 @@ def main(_):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     tf.app.run()

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-PYTHONPATH=src python3 src/codelog/tensorflow/tictactoe/dlplayer.py
+PYTHONPATH=src python3 -m codelog.tensorflow.tictactoe.deeplearn.dl0009.deeplearn0009

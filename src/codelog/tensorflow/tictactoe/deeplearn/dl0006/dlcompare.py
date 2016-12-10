@@ -6,6 +6,7 @@ from codelog.tensorflow.tictactoe import deeplearn0 as dl0, deeplearn1 as dl1
 from codelog.tensorflow.tictactoe import deeplearn5 as dl5
 from codelog.tensorflow.tictactoe.deeplearn.dl0006 import deeplearn as dl0006
 import json, time, os
+from builtins import range
 
 PKG_NAME = os.path.basename(os.path.dirname(__file__))
 

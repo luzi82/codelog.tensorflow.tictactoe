@@ -1,8 +1,10 @@
 import codelog.tensorflow.tictactoe.Logic as tttl
+import six
+from builtins import range
 
 PIDCHAR = {tttl.Pid.O:'O',tttl.Pid.X:'X',None:' '}
 
-def printStatus(status, p=print):
+def printStatus(status, p=six.print_):
 #     print("Winner: {}".format(PIDCHAR[status.winner]))
     if status == None:
         p("STATUS_NONE")
@@ -24,7 +26,7 @@ class Game(object):
     def setPlayer(self,side,player):
         self.playerDict[side] = player
 
-    def run(self,turn_count=None,game_count=None,p=print):
+    def run(self,turn_count=None,game_count=None,p=six.print_):
         if turn_count != None:
             for _ in range(turn_count):
                 self.turn(p=p)
@@ -35,7 +37,7 @@ class Game(object):
             while True:
                 self.turn(p=p)
 
-    def turn(self,p = print):
+    def turn(self,p = six.print_):
         p('=====')
 
         status = None if self.logic == None else self.logic.getStatus()

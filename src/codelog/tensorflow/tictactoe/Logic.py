@@ -1,5 +1,6 @@
 from enum import IntEnum
 import copy
+from builtins import range
 
 class XY(object):
     def __init__(self,x,y):
