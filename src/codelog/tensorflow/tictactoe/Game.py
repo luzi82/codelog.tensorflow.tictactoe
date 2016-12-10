@@ -2,14 +2,14 @@ import codelog.tensorflow.tictactoe.Logic as tttl
 
 PIDCHAR = {tttl.Pid.O:'O',tttl.Pid.X:'X',None:' '}
 
-def printStatus(status):
+def printStatus(status, p=print):
 #     print("Winner: {}".format(PIDCHAR[status.winner]))
     if status == None:
-        print("STATUS_NONE")
+        p("STATUS_NONE")
     else:
         for cl in status.cell:
-            print ("".join(PIDCHAR[c] for c in cl))
-        print("Actor: {}".format(PIDCHAR[status.actor]))
+            p ("".join(PIDCHAR[c] for c in cl))
+        p("Actor: {}".format(PIDCHAR[status.actor]))
 
 class Game(object):
 
@@ -24,25 +24,25 @@ class Game(object):
     def setPlayer(self,side,player):
         self.playerDict[side] = player
 
-    def run(self,turn_count=None,game_count=None):
+    def run(self,turn_count=None,game_count=None,p=print):
         if turn_count != None:
             for _ in range(turn_count):
-                self.turn()
+                self.turn(p=p)
         elif game_count != None:
             while self.game_done_count < game_count:
-                self.turn()
+                self.turn(p=p)
         else:
             while True:
-                self.turn()
+                self.turn(p=p)
 
-    def turn(self):
-        print('=====')
+    def turn(self,p = print):
+        p('=====')
 
         status = None if self.logic == None else self.logic.getStatus()
         for _, player in self.playerDict.items():
             player.turn_start(status)
 
-        printStatus(status)
+        printStatus(status,p=p)
 
         if self.logic == None:
             self.logic = tttl.Logic()
@@ -62,7 +62,7 @@ class Game(object):
                 cmd = activePlayer.input(status)
                 good = self.logic.action(cmd)
                 if not good:
-                    print("HLDUXMJC bad action")
+                    p("HLDUXMJC bad action")
                     self.bad_move_count_dict[status.actor] += 1
                     activePlayer.input_error()
 

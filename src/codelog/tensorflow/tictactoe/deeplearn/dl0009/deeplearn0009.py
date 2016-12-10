@@ -153,7 +153,7 @@ class DeepLearn(object):
     def cal_choice(self, state_0, mask, train_enable):
         if train_enable and random.random() < self.arg_dict['random_move_chance']:
             choice_0 = random.randrange(OUTPUT_COUNT)
-            print("GDNZVUUU cal_choice rand "+str(choice_0))
+            logging.debug("GDNZVUUU cal_choice rand "+str(choice_0))
             return {
                 'state_0': state_0,
                 'choice_0': choice_0,
@@ -165,7 +165,7 @@ class DeepLearn(object):
             score, choice_0 = self.sess.run([self.score, self.train_choice],feed_dict={self.choice_state:[state_0],self.mask:[mask]})
             score = score[0].tolist()
             choice_0 = choice_0.tolist()[0]
-            print("PWWRJCYQ pred "+json.dumps([int(x*100) for x in score]))
+            logging.debug("PWWRJCYQ pred "+json.dumps([int(x*100) for x in score]))
             return {
                 'state_0': state_0,
                 'choice_0': choice_0,
@@ -175,7 +175,7 @@ class DeepLearn(object):
             }, score[choice_0]
 
     def push_train_dict(self, train_dict):
-        print("EECSQBUX push_train_dict: "+json.dumps(train_dict))
+        logging.debug("EECSQBUX push_train_dict: "+json.dumps(train_dict))
         for k, v in self.queue.items():
             v.append(train_dict[k])
 
@@ -188,12 +188,14 @@ class DeepLearn(object):
         for k in self.var_ph_dict:
             feed_dict[self.var_ph_dict[k]] = self.var_dict[k].eval(self.sess)
         _, loss, score_diff = self.sess.run([self.train,self.loss,self.score_diff],feed_dict=feed_dict)
-        print('ZPDDPYFD loss '+str(loss)+' '+str(score_diff))
+        logging.debug('ZPDDPYFD loss '+str(loss)+' '+str(score_diff))
         self.train_count += 1
         if self.train_count % 1000 == 0:
-            os.makedirs("{}/sess".format(self.arg_dict['output_path']),exist_ok=True)
-            self.saver.save(self.sess,"{}/sess/{}.ckpt".format(self.arg_dict['output_path'],self.train_count))
-        print('HZQQMSQT '+MY_NAME+' '+str(self.train_count))
+            output_file_name = "{}/sess/{}.ckpt".format(self.arg_dict['output_path'],self.train_count)
+            os.makedirs(os.path.dirname(output_file_name),exist_ok=True)
+            self.saver.save(self.sess,output_file_name)
+            logging.info('CLPNAVGR save session: {}'.format(output_file_name))
+        logging.debug('HZQQMSQT '+MY_NAME+' '+str(self.train_count))
 
     def close(self):
         self.sess.close()
@@ -242,7 +244,7 @@ class DLPlayer(object):
         self.train_dict, _ = self.dl.cal_choice(new_status,self.legit_mask,self.train_enable)
         
         choice = self.train_dict['choice_0']
-        print("GKPMPCLI choice: "+str(choice))
+        logging.debug("GKPMPCLI choice: "+str(choice))
 
         self.last_choice = choice
         return dlplayer.ACTION_MAP[choice]
@@ -317,6 +319,12 @@ def main(_):
         help='TRAIN_BETA',
         default=0.99
     )
+    argparser.add_argument(
+        '--turn_count',
+        type=int,
+        help='turn_count',
+        default=None
+    )
 #     argparser.add_argument(
 #         '--element_l2_factor',
 #         type=float,
@@ -337,6 +345,7 @@ def main(_):
     )
     args, _ = argparser.parse_known_args()
     arg_dict = vars(args)
+    logging.info('YGYMBFMN arg_dict {}'.format(json.dumps(arg_dict)))
     if(arg_dict['output_path']==None):
         timestamp = int(time.time())
         arg_dict['output_path'] = 'output/{}/deeplearn/{}'.format(MY_NAME, timestamp)
@@ -357,7 +366,7 @@ def main(_):
     game.setPlayer(tttl.Pid.O, po)
     game.setPlayer(tttl.Pid.X, px)
     
-    game.run()
+    game.run(turn_count=arg_dict['turn_count'],p=logging.debug)
 
 
 if __name__ == '__main__':
