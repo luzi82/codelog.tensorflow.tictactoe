@@ -371,5 +371,5 @@ def main(_):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     tf.app.run()
