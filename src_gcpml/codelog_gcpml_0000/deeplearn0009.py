@@ -147,7 +147,9 @@ class DeepLearn(object):
         self.train_count = 0
         self.saver = tf.train.Saver(self.var_dict,max_to_keep=None)
         self.timestamp = time.time()
-        
+
+        tf.train.SummaryWriter(self.arg_dict['output_path'], self.sess.graph)
+
     def load_sess(self,filename):
         self.saver.restore(self.sess, filename)
 
@@ -192,7 +194,7 @@ class DeepLearn(object):
         logging.debug('ZPDDPYFD loss '+str(loss)+' '+str(score_diff))
         self.train_count += 1
         if self.train_count % 1000 == 0:
-            output_file_name = "{}/sess/{}.ckpt".format(self.arg_dict['output_path'],self.train_count)
+            output_file_name = "{}/{}.ckpt".format(self.arg_dict['output_path'],self.train_count)
             py23.makedirs(os.path.dirname(output_file_name),exist_ok=True)
             self.saver.save(self.sess,output_file_name)
             logging.info('CLPNAVGR save session: {}, loss: {}, time: {}'.format(output_file_name,loss,int((time.time()-self.timestamp)*1000)))
