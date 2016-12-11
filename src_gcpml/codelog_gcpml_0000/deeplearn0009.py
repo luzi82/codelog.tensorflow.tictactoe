@@ -7,13 +7,13 @@ from collections import deque
 import json
 import time, os
 import copy
-from codelog.tensorflow.tictactoe import dlplayer
-from codelog.tensorflow.tictactoe.Game import Game
-import codelog.tensorflow.tictactoe.Logic as tttl
+from codelog_gcpml_0000.Game import Game
+from codelog_gcpml_0000 import dlplayer
+from codelog_gcpml_0000 import Logic as tttl
 import random
 import logging
 import argparse
-from codelog.tensorflow.tictactoe import py23
+from codelog_gcpml_0000 import py23
 
 MY_NAME = os.path.basename(os.path.dirname(__file__))
 
