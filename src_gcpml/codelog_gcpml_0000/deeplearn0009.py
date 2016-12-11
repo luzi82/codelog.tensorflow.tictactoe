@@ -27,12 +27,18 @@ def new_state_ph():
 def new_var_dict():
     stddev = 0.4
     ret = {}
-    ret['w0']=tf.Variable(tf.random_normal([9,50] ,stddev=stddev,dtype=tf.float32))
-    ret['b1']=tf.Variable(tf.random_normal([50]   ,stddev=stddev,dtype=tf.float32))
-    ret['w2']=tf.Variable(tf.random_normal([50,50],stddev=stddev,dtype=tf.float32))
-    ret['b3']=tf.Variable(tf.random_normal([50]   ,stddev=stddev,dtype=tf.float32))
-    ret['w4']=tf.Variable(tf.random_normal([50,9] ,stddev=stddev,dtype=tf.float32))
-    ret['b5']=tf.Variable(tf.random_normal([9]    ,stddev=stddev,dtype=tf.float32))
+    ret['w0']=tf.Variable(tf.random_normal([9,100]  ,stddev=stddev,dtype=tf.float32))
+    ret['b1']=tf.Variable(tf.random_normal([100]    ,stddev=stddev,dtype=tf.float32))
+    ret['w2']=tf.Variable(tf.random_normal([100,100],stddev=stddev,dtype=tf.float32))
+    ret['b3']=tf.Variable(tf.random_normal([100]    ,stddev=stddev,dtype=tf.float32))
+    ret['w4']=tf.Variable(tf.random_normal([100,100],stddev=stddev,dtype=tf.float32))
+    ret['b5']=tf.Variable(tf.random_normal([100]    ,stddev=stddev,dtype=tf.float32))
+    ret['w6']=tf.Variable(tf.random_normal([100,100],stddev=stddev,dtype=tf.float32))
+    ret['b7']=tf.Variable(tf.random_normal([100]    ,stddev=stddev,dtype=tf.float32))
+    ret['w8']=tf.Variable(tf.random_normal([100,100],stddev=stddev,dtype=tf.float32))
+    ret['b9']=tf.Variable(tf.random_normal([100]    ,stddev=stddev,dtype=tf.float32))
+    ret['wa']=tf.Variable(tf.random_normal([100,9]  ,stddev=stddev,dtype=tf.float32))
+    ret['bb']=tf.Variable(tf.random_normal([9]      ,stddev=stddev,dtype=tf.float32))
     return ret
 
 def new_train_ph_dict():
@@ -60,7 +66,16 @@ def get_q(state_ph,var_dict):
     mid = mid + var_dict['b3']
     mid = tf.nn.elu(mid)
     mid = tf.matmul(mid,var_dict['w4'])
-    mid = mid + var_dict['b5'] * tf.constant(0.05)
+    mid = mid + var_dict['b5']
+    mid = tf.nn.elu(mid)
+    mid = tf.matmul(mid,var_dict['w6'])
+    mid = mid + var_dict['b7']
+    mid = tf.nn.elu(mid)
+    mid = tf.matmul(mid,var_dict['w8'])
+    mid = mid + var_dict['b9']
+    mid = tf.nn.elu(mid)
+    mid = tf.matmul(mid,var_dict['wa'])
+    mid = mid + var_dict['bb']
     return mid
 
 def get_train_choice(state_ph,var_dict,random_t,mask):
