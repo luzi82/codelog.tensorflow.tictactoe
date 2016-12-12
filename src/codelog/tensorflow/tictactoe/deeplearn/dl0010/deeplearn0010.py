@@ -1,4 +1,4 @@
-# clone of deeplearn 10
+# clone of deeplearn 9
 # make the py run ok in windows
 
 import tensorflow as tf
