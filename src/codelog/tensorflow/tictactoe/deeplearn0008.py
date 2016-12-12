@@ -231,21 +231,9 @@ class DLPlayer(object):
         self.train_dict = None
         self.last_choice = None
 
-    def input(self,status,retry):
-        if not retry:
+    def input(self,status):
+        if self.legit_mask == None:
             self.legit_mask = [1.0]*9
-            self.train_dict = None
-            self.last_choice = None
-        else:
-            self.legit_mask[self.last_choice] = 0.0
-            if self.train_enable:
-                if self.train_dict != None:
-                    train_dict = copy.copy(self.train_dict)
-                    train_dict['state_1'] = train_dict['state_0']
-                    train_dict['cont'] = 0
-                    train_dict['reward_1'] = REWARD_BAD
-                    self.dl.push_train_dict(train_dict)
-                    self.dl.do_train()
 
         new_status = dlplayer.conv_status(status,self.side)
         self.train_dict, _ = self.dl.cal_choice(new_status,self.legit_mask,self.train_enable)
@@ -255,6 +243,16 @@ class DLPlayer(object):
 
         self.last_choice = choice
         return dlplayer.ACTION_MAP[choice]
+
+    def input_error(self):
+        self.legit_mask[self.last_choice] = 0.0
+        if self.train_enable:
+            train_dict = copy.copy(self.train_dict)
+            train_dict['state_1'] = train_dict['state_0']
+            train_dict['cont'] = 0
+            train_dict['reward_1'] = REWARD_BAD
+            self.dl.push_train_dict(train_dict)
+            self.dl.do_train()
 
     def turn_end(self,status):
         if self.train_enable:
