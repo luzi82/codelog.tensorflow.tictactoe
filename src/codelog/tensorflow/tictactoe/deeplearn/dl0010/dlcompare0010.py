@@ -23,23 +23,23 @@ def vs(player_o,player_x,game_count):
 
     return game.result()
 
-def create_player(param_dict):
+def create_player(param_dict,arg_dict):
     if param_dict['type'] == 'perfect':
         return perfect.Player()
     if param_dict['type'] == 'random':
         return random_player.Player()
     if param_dict['type'] == PKG_NAME:
-        dl = dlme.DeepLearn()
+        dl = dlme.DeepLearn(arg_dict)
         dl.load_sess(param_dict['filename'])
         ret = dlme.DLPlayer(dl)
         ret.set_train_enable(False)
         return ret
     return None
 
-def run_vs_dict(vs_dict):
+def run_vs_dict(vs_dict,arg_dict):
     tf.reset_default_graph()
-    po = create_player(vs_dict['O'])
-    px = create_player(vs_dict['X'])
+    po = create_player(vs_dict['O'],arg_dict)
+    px = create_player(vs_dict['X'],arg_dict)
     result = vs(po,px,1000)
     po.close()
     px.close()
@@ -59,15 +59,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Compare trained model with random and perfect AI')
     parser.add_argument('timestamp', metavar='N', type=int, nargs='?', default=None, help='timestamp of training begin')
     args = parser.parse_args()
+    arg_dict = vars(args)
+    arg_dict['output_path'] = '/tmp/'+PKG_NAME
+    arg_dict['random_stddev'] = 0
+    arg_dict['random_move_chance'] = 0
+    arg_dict['train_beta'] = 0
+    arg_dict['train_memory'] = 100
 
-    if args.timestamp == None:
-        filename_list = os.listdir('sess/'+PKG_NAME)
+    if arg_dict['timestamp'] == None:
+        filename_list = os.listdir('output/'+PKG_NAME)
         if len(filename_list) <= 0:
-            raise 'sess/'+PKG_NAME+' is empty'
+            raise 'output/'+PKG_NAME+' is empty'
         filename_int_list = [to_int(filename,-1) for filename in filename_list]
         arg_timestamp = str(max(filename_int_list))
     else:
-        arg_timestamp = str(args.timestamp)
+        arg_timestamp = str(arg_dict['timestamp'])
 
     timestamp = int(time.time())
 
@@ -75,7 +81,7 @@ if __name__ == '__main__':
         {
             'name':'d','type':PKG_NAME,
             'count':500,'step':10000,
-            'filename_format':'sess/'+PKG_NAME+'/'+arg_timestamp+'/{}.ckpt',
+            'filename_format':'output/'+PKG_NAME+'/'+arg_timestamp+'/{}.ckpt',
         }
     ]
 
@@ -123,7 +129,7 @@ if __name__ == '__main__':
 
     result_list = []
     for vs_dict in vs_dict_list:
-        result = run_vs_dict(vs_dict)
+        result = run_vs_dict(vs_dict,arg_dict)
         result_list.append({
             'input':vs_dict,
             'result':result,
