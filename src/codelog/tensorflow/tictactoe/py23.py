@@ -1,5 +1,6 @@
 import sys
 import os, errno
+import builtins
 
 if sys.version_info.major == 2:
 
@@ -12,7 +13,10 @@ if sys.version_info.major == 2:
                     raise
         else:
             os.makedirs(name,mode)
+    
+    range_ = builtins.range
 
 elif sys.version_info.major == 3:
 
     makedirs = os.makedirs
+    range_ = range
