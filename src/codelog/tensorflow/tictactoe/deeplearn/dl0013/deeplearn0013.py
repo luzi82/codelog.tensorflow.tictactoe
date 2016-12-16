@@ -412,5 +412,6 @@ def main(_):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    py23.makedirs(os.path.join('log',MY_NAME),exist_ok=True)
+    logging.basicConfig(level=logging.INFO,filename=os.path.join('log',MY_NAME,'{}.log'.format(str(int(time.time())))))
     tf.app.run()
