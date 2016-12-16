@@ -61,15 +61,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
     arg_dict = vars(args)
     arg_dict['output_path'] = '/tmp/'+PKG_NAME
-    arg_dict['random_stddev'] = 0
-    arg_dict['random_move_chance'] = 0
-    arg_dict['train_beta'] = 0
+    arg_dict['random_stddev'] = 0.1
+    arg_dict['random_move_chance'] = 0.
+    arg_dict['train_beta'] = 0.
     arg_dict['train_memory'] = 100
 
     if arg_dict['timestamp'] == None:
-        filename_list = os.listdir('output/'+PKG_NAME)
+        filename_list = os.listdir('output/'+PKG_NAME+'/deeplearn')
         if len(filename_list) <= 0:
-            raise 'output/'+PKG_NAME+' is empty'
+            raise 'output/'+PKG_NAME+'/deeplearn is empty'
         filename_int_list = [to_int(filename,-1) for filename in filename_list]
         arg_timestamp = str(max(filename_int_list))
     else:
@@ -80,8 +80,8 @@ if __name__ == '__main__':
     vs_dict_meta_list = [
         {
             'name':'d','type':PKG_NAME,
-            'count':500,'step':10000,
-            'filename_format':'output/'+PKG_NAME+'/'+arg_timestamp+'/{}.ckpt',
+            'count':500,'step':1000,
+            'filename_format':'output/'+PKG_NAME+'/deeplearn/'+arg_timestamp+'/sess/{}',
         }
     ]
 
