@@ -1,3 +1,5 @@
+# WARNING: this code is fail to make good AI
+
 # clone of deeplearn 12
 # do training on highest loss sample
 

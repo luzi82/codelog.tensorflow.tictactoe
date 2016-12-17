@@ -5,6 +5,8 @@ from codelog.tensorflow.tictactoe import Logic as tl
 from codelog.tensorflow.tictactoe.deeplearn.dl0013 import deeplearn0013 as dlme
 import json, time, os
 from builtins import range
+import logging
+from codelog.tensorflow.tictactoe import py23
 
 PKG_NAME = os.path.basename(os.path.dirname(__file__))
 
@@ -17,7 +19,7 @@ def vs(player_o,player_x,game_count):
     game.setPlayer(tl.Pid.O, player_o)
     game.setPlayer(tl.Pid.X, player_x)
     
-    game.run(game_count=game_count)
+    game.run(game_count=game_count,p=logging.debug)
 
     return game.result()
 
@@ -41,8 +43,8 @@ def run_vs_dict(vs_dict,arg_dict):
     result = vs(po,px,1000)
     po.close()
     px.close()
-    print(vs_dict)
-    print(json.dumps(result))
+    logging.info(vs_dict)
+    logging.info(json.dumps(result))
     return result
 
 def to_int(x, y):
@@ -52,6 +54,10 @@ def to_int(x, y):
         return y
 
 if __name__ == '__main__':
+    log_filename = os.path.join('log',PKG_NAME,'dlcomapre','{}.log'.format(str(int(time.time()))))
+    py23.makedirs(os.path.dirname(log_filename),exist_ok=True)
+    logging.basicConfig(level=logging.INFO,filename=log_filename)
+
     import argparse
 
     parser = argparse.ArgumentParser(description='Compare trained model with random and perfect AI')
@@ -67,7 +73,7 @@ if __name__ == '__main__':
     if arg_dict['timestamp'] == None:
         filename_list = os.listdir('output/'+PKG_NAME+'/deeplearn')
         if len(filename_list) <= 0:
-            raise 'output/'+PKG_NAME+' is empty'
+            raise 'output/'+PKG_NAME+'/deeplearn is empty'
         filename_int_list = [to_int(filename,-1) for filename in filename_list]
         arg_timestamp = str(max(filename_int_list))
     else:
@@ -78,7 +84,7 @@ if __name__ == '__main__':
     vs_dict_meta_list = [
         {
             'name':'d','type':PKG_NAME,
-            'count':100,'step':1000,
+            'count':50,'step':10000,
             'filename_format':'output/'+PKG_NAME+'/deeplearn/'+arg_timestamp+'/sess/{}',
         }
     ]
@@ -133,7 +139,7 @@ if __name__ == '__main__':
             'result':result,
         })
     for result in result_list:
-        print(json.dumps(result))
+        logging.info(json.dumps(result))
     os.makedirs("output/"+PKG_NAME+"/dlcompare",exist_ok=True)
     with open('output/'+PKG_NAME+'/dlcompare/{}.json'.format(timestamp),'w') as out_file:
         json.dump(result_list,out_file)

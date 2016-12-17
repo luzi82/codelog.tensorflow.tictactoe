@@ -7,13 +7,31 @@ Created on Jul 12, 2016
 import json
 import matplotlib.pyplot as plt
 from builtins import range
+import os.path
+import argparse
+from codelog.tensorflow.tictactoe import util as myutil
 
-ITR_COUNT = 100
+ITR_COUNT = 50
+MY_NAME = os.path.basename(os.path.dirname(__file__))
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser(description='Show graph')
+    parser.add_argument('filename', metavar='N', type=int, nargs='?', default=None, help='compare filename')
+    args = parser.parse_args()
+
+    arg_dict = vars(args)
+    
+    if arg_dict['filename'] == None:
+        dlcompare_path = os.path.join('output',MY_NAME,'dlcompare')
+        filename_list = os.listdir(dlcompare_path)
+        if len(filename_list) <= 0:
+            raise '{} is empty'.format(dlcompare_path)
+        filename_int_list = [myutil.to_int(filename[:-5],-1) for filename in filename_list if filename.endswith('.json')]
+        arg_dict['filename'] = os.path.join(dlcompare_path,'{}.json'.format(max(filename_int_list)))
+
     data_dict = {}
-    with open('output/dl0013/dlcompare/1481879407.json','r') as in_file:
+    with open(arg_dict['filename'],'r') as in_file:
         result_list = json.load(in_file)
 
     win_key_list = [
@@ -23,7 +41,7 @@ if __name__ == '__main__':
         {'type':'win','name':'dr','win':'X','style':'gx'},
         {'type':'win','name':'rd','win':'X','style':'bo'},
         {'type':'win','name':'dr','win':'O','style':'bx'},
-        {'type':'badmove','name':'dl0013','style':'k+'},
+        {'type':'badmove','name':MY_NAME,'style':'k+'},
     ]
     for win_key in win_key_list:
         if win_key['type'] == 'win':
