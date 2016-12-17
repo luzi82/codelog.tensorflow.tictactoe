@@ -1,3 +1,4 @@
 *.pyc
 /sess
 /output/
+/log
