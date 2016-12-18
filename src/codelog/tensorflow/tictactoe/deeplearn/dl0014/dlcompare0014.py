@@ -2,7 +2,7 @@ import tensorflow as tf
 from codelog.tensorflow.tictactoe import Game as tg
 from codelog.tensorflow.tictactoe import perfect, random_player
 from codelog.tensorflow.tictactoe import Logic as tl
-from codelog.tensorflow.tictactoe.deeplearn.dl0013 import deeplearn0013 as dlme
+from codelog.tensorflow.tictactoe.deeplearn.dl0014 import deeplearn0014 as dlme
 import json, time, os
 from builtins import range
 import logging
