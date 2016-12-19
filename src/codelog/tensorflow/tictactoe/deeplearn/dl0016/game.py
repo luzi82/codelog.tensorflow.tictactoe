@@ -1,5 +1,11 @@
 import six
 from builtins import range
+from enum import IntEnum
+
+class Result(IntEnum):
+    WIN = 1
+    DRAW = 0
+    LOSE = -1
 
 class Game(object):
 
@@ -9,9 +15,9 @@ class Game(object):
 
         self.pid_enum = logic.get_pid_enum()
 
-        self.win_count_dict = {pid:0 for pid in self.pid_enum}
-        self.win_count_dict[None] = 0
-        self.bad_move_count_dict = {pid:0 for pid in self.pid_enum}
+        self.result_dict_dict = { pid:{ r:0 for r in Result } for pid in self.pid_enum }
+        self.bad_move_count_dict = { pid:0 for pid in self.pid_enum }
+        self.game_done_count = 0
 
         self.state = None
 
@@ -29,19 +35,23 @@ class Game(object):
     def turn(self,p = six.print_):
         p('=====')
 
-        for player in self.playerDict.values():
+        for player in self.player_dict.values():
             player.turn_start(self.state)
 
         p("status: {}".format(self.state))
 
         if self.state == None:
             self.state = self.logic.get_new_game_state()
-            for player in self.playerDict.values():
+            for player in self.player_dict.values():
                 player.new_game(self.state)
         elif not self.logic.get_continue(self.state):
-            for player in self.playerDict.values():
+            result_dict = self.logic.get_result_dict(self.state)
+            for pid in self.pid_enum:
+                self.result_dict_dict[pid][result_dict[pid]] += 1
+            for player in self.player_dict.values():
                 player.end_game(self.state)
             self.state = None
+            self.game_done_count += 1
         else:
             good_dict = {pid:False for pid in self.pid_enum}
             action_dict = {pid:None for pid in self.pid_enum}
@@ -51,7 +61,7 @@ class Game(object):
                         continue
                     action_dict[pid] = self.player_dict[pid].input(self.state)
                 
-                good_dict_0 = self.logic.verify_action(action_dict)
+                good_dict_0 = self.logic.verify_action(self.state,action_dict)
                 
                 for pid in self.pid_enum:
                     if good_dict[pid]:
@@ -59,6 +69,7 @@ class Game(object):
                     if good_dict_0[pid]:
                         self.player_dict[pid].input_ok()
                     else:
+                        self.bad_move_count_dict[pid] += 1
                         self.player_dict[pid].input_error()
                 
                 good_dict = good_dict_0
@@ -67,13 +78,21 @@ class Game(object):
                     if not good_dict[pid]:
                         continue
                 break
+            self.logic.process_action(self.state,action_dict)
 
-        for player in self.playerDict.values():
-            player.turn_end(self.status)
+        if self.state == None:
+            continue_ = None
+            win_dict = None
+        else:
+            continue_ = self.logic.get_continue(self.state)
+            win_dict = self.logic.get_result_dict(self.state)
+
+        for player in self.player_dict.values():
+            player.turn_end(self.state,continue_,win_dict)
 
     def result(self):
         return {
-            'win_count_dict':{(k.name if k!=None else "null"):v for k,v in self.win_count_dict.items()},
+            'result_dict_dict':{k.name:{kk.name:v for kk,v in vl.items()} for k,vl in self.result_dict_dict.items()},
             'bad_move_count_dict':{k.name:v for k,v in self.bad_move_count_dict.items()},
             'game_done_count':self.game_done_count
         }

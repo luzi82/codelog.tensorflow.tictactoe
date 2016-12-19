@@ -1,12 +1,12 @@
 from builtins import range
 from .ttt_common import XY, Pid, OPP, AbstractLogic
+from .game import Result
 
 class Logic(AbstractLogic):
 
     def get_continue(self,state):
-        win_dict = self.get_win_dict(state)
-        for v in win_dict.values():
-            if v:
+        for pid in Pid:
+            if self._check_win(state,pid):
                 return False
         for cell_list in state.cell_list_list:
             for cell in cell_list:
@@ -14,9 +14,15 @@ class Logic(AbstractLogic):
                     return True
         return False
 
-    def get_win_dict(self,state):
-        ret = { pid: self._check_win(state,pid) for pid in Pid }
-        return ret
+    def get_result_dict(self,state):
+        for pid in Pid:
+            if self._check_win(state,pid):
+                return { pid:Result.WIN, OPP[pid]:Result.LOSE }
+        for cell_list in state.cell_list_list:
+            for cell in cell_list:
+                if cell == None:
+                    return None
+        return { pid:Result.DRAW for pid in Pid }
 
     def verify_action(self,state, action_dict):
         turn_pid = self._get_turn_pid(state)
@@ -77,7 +83,7 @@ if __name__ == '__main__':
     state = logic.get_new_game_state()
     print(json.dumps(state.__dict__))
     print(json.dumps(logic.get_continue(state)))
-    print(json.dumps(logic.get_win_dict(state)))
+    print(json.dumps(logic.get_result_dict(state)))
     print(state)
     assert(logic._get_turn_pid(state)==Pid.X)
 
@@ -85,7 +91,7 @@ if __name__ == '__main__':
     print(json.dumps(logic.process_action(state,{Pid.X:XY(0,0),Pid.O:None})))
     print(json.dumps(state.__dict__))
     print(json.dumps(logic.get_continue(state)))
-    print(json.dumps(logic.get_win_dict(state)))
+    print(json.dumps(logic.get_result_dict(state)))
     print(state)
     assert(logic._get_turn_pid(state)==Pid.O)
 
@@ -93,7 +99,7 @@ if __name__ == '__main__':
     print(json.dumps(logic.process_action(state,{Pid.X:XY(1,0),Pid.O:XY(0,1)})))
     print(json.dumps(state.__dict__))
     print(json.dumps(logic.get_continue(state)))
-    print(json.dumps(logic.get_win_dict(state)))
+    print(json.dumps(logic.get_result_dict(state)))
     print(state)
 
     print(json.dumps(logic.verify_action(state,{Pid.X:XY(0,0),Pid.O:None})))
@@ -104,5 +110,5 @@ if __name__ == '__main__':
     print(json.dumps(logic.process_action(state,{Pid.X:XY(2,0),Pid.O:None})))
     print(json.dumps(state.__dict__))
     print(json.dumps(logic.get_continue(state)))
-    print(json.dumps(logic.get_win_dict(state)))
+    print(json.dumps(logic.get_result_dict(state)))
     print(state)
