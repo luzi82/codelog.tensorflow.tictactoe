@@ -11,7 +11,7 @@ import codelog.tensorflow.tictactoe.Logic as tttl
 import random
 import logging
 import argparse
-from codelog.tensorflow.tictactoe import py23
+from codelog.tensorflow.tictactoe import py23, util
 
 MY_NAME = os.path.basename(os.path.dirname(__file__))
 
@@ -193,6 +193,11 @@ class DeepLearn(object):
         
         self.push_done = 0
         self.push_idx = 0
+
+        if arg_dict['continue']:
+            while os.path.isfile(os.path.join(os.path.join(arg_dict['path'],'deeplearn','sess','{}.index'.format(self.train_count+1000)))):
+                self.train_count += 1000
+            self.load_sess(os.path.join(arg_dict['path'],'deeplearn','sess',str(self.train_count)))
         
     def load_sess(self,filename):
         self.saver.restore(self.sess, filename)
@@ -399,6 +404,11 @@ def main(_):
         help='device',
         default=None
     )
+    argparser.add_argument(
+        '--continue',
+        action='store_true',
+        help='continue'
+    )
 #     argparser.add_argument(
 #         '--element_l2_factor',
 #         type=float,
@@ -421,12 +431,24 @@ def main(_):
     arg_dict = vars(args)
     logging.info('YGYMBFMN arg_dict {}'.format(json.dumps(arg_dict)))
     if(arg_dict['output_path']==None):
-        timestamp = int(time.time())
-        arg_dict['output_path'] = os.path.join('output',MY_NAME,str(timestamp),'deeplearn')
-    
-    py23.makedirs(arg_dict['output_path'],exist_ok=True)
-    with open(os.path.join(arg_dict['output_path'],'input_arg_dict.json'),'w') as out_file:
-        json.dump(arg_dict,out_file)
+        if not arg_dict['continue']:
+            timestamp = int(time.time())
+            arg_dict['output_path'] = os.path.join('output',MY_NAME,str(timestamp),'deeplearn')
+        else:
+            filename_list = os.listdir(os.path.join('output',MY_NAME))
+            filename_int_list = [util.to_int(filename,-1) for filename in filename_list]
+            arg_timestamp = str(max(filename_int_list))
+            arg_dict['output_path'] = os.path.join('output',MY_NAME,str(arg_timestamp),'deeplearn')
+
+    if arg_dict['continue']:
+        with open(os.path.join(arg_dict['output_path'],'input_arg_dict.json'),'r') as deeplearn_arg_dict_file:
+            deeplearn_arg_dict = json.load(deeplearn_arg_dict_file)
+        arg_dict = deeplearn_arg_dict
+        arg_dict['continue'] = True
+    else:
+        py23.makedirs(arg_dict['output_path'],exist_ok=True)
+        with open(os.path.join(arg_dict['output_path'],'input_arg_dict.json'),'w') as out_file:
+            json.dump(arg_dict,out_file)
 
     with tf.device(arg_dict['device']):
 #     with tf.device('/gpu:0'):
