@@ -194,7 +194,7 @@ class DeepLearn(object):
         self.push_done = 0
         self.push_idx = 0
 
-        if arg_dict['continue']:
+        if ('continue' in arg_dict) and (arg_dict['continue']):
             while os.path.isfile(os.path.join(os.path.join(arg_dict['output_path'],'sess','{}.index'.format(self.train_count+1000)))):
                 self.train_count += 1000
             self.load_sess(os.path.join(arg_dict['output_path'],'sess',str(self.train_count)))
