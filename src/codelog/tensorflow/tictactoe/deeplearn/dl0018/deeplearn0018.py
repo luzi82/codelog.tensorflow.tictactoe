@@ -439,7 +439,7 @@ def main(_):
         '--starter_learning_rate',
         type=float,
         help='starter_learning_rate',
-        default=0.1
+        default=0.01
     )
     argparser.add_argument(
         '--learning_rate_decay_steps',
