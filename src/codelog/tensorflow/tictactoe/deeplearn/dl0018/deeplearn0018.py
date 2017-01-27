@@ -227,7 +227,7 @@ class DeepLearn(object):
             score = score[0].tolist()
             weight = weight[0].tolist()
             choice_0 = choice_0.tolist()[0]
-            logging.debug("PWWRJCYQ score {}, weight {}, choice {}".format(json.dumps([int(x*100) for x in score]),json.dumps([int(x*100) for x in weight]),choice_0))
+            logging.debug("PWWRJCYQ score {}, weight {}, choice {}".format(json.dumps(score),json.dumps(weight),choice_0))
             return {
                 'state_0': state_0,
                 'choice_0': choice_0,
