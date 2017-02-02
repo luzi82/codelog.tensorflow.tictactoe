@@ -1,5 +1,6 @@
 # clone of deeplearn 18
 # use AdamOptimizer with decay
+# loss does not drop, not good
 
 import tensorflow as tf
 import json
